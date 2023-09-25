@@ -1,22 +1,73 @@
-import ToDoList from './ToDoList.jsx';
+import { useState } from 'react';
+import AddTaskForm from './AddTaskForm';
+import ToDoList from './ToDoList';
 
 function App() {
-  return (
-    <div className="w-full h-screen bg-bgColor">
-        <div className="border-b border-dark">
-            <h1 className="p-2 text-2xl text-primary">ToDoLoo</h1>
-        </div>
+    const [todos, setTodos] = useState([]);
 
-        {/* <div className="flex flex-col bg-primary">
-            <div className="bg-secondary">
-                <input type="text" className="w-full border"/>
-            </div>
-        </div> */}
-        <ToDoList></ToDoList>
-        
-    </div>
+    function addTask(title) {
+        setTodos(currentTodos => {
+            return [
+                ...currentTodos,
+                {id: crypto.randomUUID(), title, completed: false},
+            ]
+        })
+    }
+
+    function checkTask(id, completed) {
+        setTodos(currentTodos => {
+            return currentTodos.map(todo => {
+                if (todo.id === id) {
+                    return { ...todo, completed }
+                }
+
+                return todo;
+            })
+        })
+    }
+
+    function deleteTask(id) {
+        setTodos(currentTodos => {
+            return currentTodos.filter(todo => todo.id !== id)
+        })
+    }
+
+    function toggleEdit(id) {
+        setTodos((currentTodos) =>
+          currentTodos.map((todo) => {
+            if (todo.id === id) {
+              return { ...todo, editable: !todo.editable };
+            }
     
-  )
+            return todo;
+          })
+        );
+    }
+
+    function updateTask(id, newTaskTitle) {
+        setTodos(currentTodos => {
+            return currentTodos.map(todo => {
+                if (todo.id === id) {
+                    return { ...todo, title: newTaskTitle };
+                }
+                return todo;
+            });
+        });
+    }
+
+    return (
+        <div className="w-full h-screen bg-bgColor flex flex-col">
+            <AddTaskForm onSubmit={addTask} />
+
+            <ToDoList 
+                todos={todos} 
+                checkTask={checkTask}
+                toggleEdit={toggleEdit}
+                updateTask={updateTask}
+                deleteTask={deleteTask}
+            />
+        </div>
+    )
 }
 
-export default App
+export default App;
